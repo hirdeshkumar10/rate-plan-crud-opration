@@ -4,6 +4,8 @@ import com.sunglowsys.domain.RatePlan;
 import com.sunglowsys.service.RatePlanService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -23,6 +25,7 @@ public class RatePlanResource {
     public RatePlanResource(RatePlanService ratePlanService) {
         this.ratePlanService = ratePlanService;
     }
+
     @PostMapping("/rate-plans")
     public ResponseEntity<RatePlan> createRatePlan(@RequestBody RatePlan ratePlan)throws URISyntaxException{
         log.debug("rest request to save RatePlan: {}",ratePlan);
@@ -48,12 +51,12 @@ public class RatePlanResource {
     }
 
     @GetMapping("/rate-plans")
-    public ResponseEntity<List<RatePlan>> findAllRatePlan(){
-        log.debug("rest request to findAll RatePlan:");
-        List<RatePlan> result = ratePlanService.findAll();
+    public ResponseEntity<List<RatePlan>> findAllRatePlan(Pageable pageable){
+        log.debug("rest request to findAll RatePlan: {}",pageable.toString());
+        Page<RatePlan> result = ratePlanService.findAll(pageable);
         return ResponseEntity
                 .ok()
-                .body(result);
+                .body(result.getContent());
     }
 
     @GetMapping("/rate-plans/{id}")
@@ -70,7 +73,9 @@ public class RatePlanResource {
     public ResponseEntity<Void> deleteRatePlan(@PathVariable Long id){
         log.debug("rest request to save RatePlan: {}",id);
         ratePlanService.delete(id);
-        return ResponseEntity.noContent().build();
+        return ResponseEntity
+                .ok()
+                .build();
     }
 
 }
